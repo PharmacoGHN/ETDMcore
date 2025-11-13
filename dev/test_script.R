@@ -23,15 +23,11 @@ param_with_eta <- which(param_contains_eta)
 omega <- model$omega[[1]]
 
 
-
-
-
 # create data
 
 pop_data <- data.frame(id = 1:100)
 
 for (i in 1:ncol(param)) {
-
   param_name <- names(param)[i]
   typical_value <- param[1, i]
 
@@ -43,8 +39,8 @@ for (i in 1:ncol(param)) {
     eta_param_name <- paste0("ETA", gsub("TV", "", param_name))
     eta_param <- omega[eta_param_name, eta_param_name]
     # generate random values for the parameter
-    pop_data[[gsub("TV","",param_name)]] <- rlnorm(n, meanlog = log(typical_value), sdlog = eta_param)
+    pop_data[[gsub("TV", "", param_name)]] <- rlnorm(n, meanlog = log(typical_value), sdlog = eta_param)
   } else {
-    pop_data[[gsub("TV","",param_name)]] <- typical_value
-  }    
+    pop_data[[gsub("TV", "", param_name)]] <- typical_value
+  }
 }
