@@ -139,8 +139,11 @@ plotSim <- function(sim_data, unit = "mg/L", log_scale = FALSE) {
     ggplot2::theme_bw()
 
   # set log axis if specified
-  if (log_scale) {
+  if (log_scale == "pseudo") {
     plot <- plot + ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10))
+  }
+  if (log_scale == TRUE) {
+    plot <- plot + ggplot2::scale_y_log10()
   }
 
   return(plot)
