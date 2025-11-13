@@ -13,6 +13,7 @@ expected_pop_file <- data.frame(
 )
 
 test_that("multiplication works", {
+  testthat::skip_if_not_installed("mrgsolve")
   library(mrgsolve)
   model <- mread(test_path("testdata/test_model.mod"))
   pop_data <- makePopulationData(model, n = 10, seed = TRUE)

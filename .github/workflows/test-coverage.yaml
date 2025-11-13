@@ -26,6 +26,9 @@ jobs:
         with:
           extra-packages: any::covr, any::xml2
           needs: coverage
+          
+      - name: Install test dependencies
+        run: R -e 'install.packages(c("mrgsolve"), repos="https://cloud.r-project.org")'
 
       - name: Test coverage
         run: |
