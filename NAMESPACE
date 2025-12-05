@@ -2,6 +2,7 @@
 
 export(makePopulationData)
 export(plotSim)
+export(read_model)
 export(runSim)
 import(ggplot2)
 importFrom(graphics,plot)

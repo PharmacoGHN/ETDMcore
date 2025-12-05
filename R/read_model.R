@@ -1,3 +1,7 @@
+
+#' read_model
+#' 
+#' @export
 read_model <- function(model, cache = FALSE) {
 
   # call function based on cache parameters

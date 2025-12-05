@@ -96,7 +96,12 @@ runSim <- function(model, population_data, amt, plot = FALSE) {
 
 #' @title Plot simulation results
 #' @description Plot simulation results from mrgsolve simulation object
-#' @return plot of simulation results
+#' @param sim_data mrgsolve simulation object
+#' @param unit character, unit of concentration to display on y-axis
+#' @param log_scale logical or character, if TRUE use log10 scale for y-axis, if "pseudo" use pseudo-log scale
+#' @param plotly logical, if TRUE return a plotly object instead of ggplot2
+#' @param concentration data.frame, optional dataframe with columns 'time' and 'concentration' for observed data
+#' @return plot of simulation results (ggplot2 or plotly object)
 #' @examples
 #' \dontrun{
 #' library(mrgsolve)
@@ -104,6 +109,9 @@ runSim <- function(model, population_data, amt, plot = FALSE) {
 #' pop_data <- make_population_data(model, n = 500)
 #' sim_data <- runSim(model, pop_data, amt = 1000)
 #' plotSim(sim_data)
+#' # With observed data
+#' obs_data <- data.frame(time = c(1, 2, 4, 8), concentration = c(10, 8, 5, 2))
+#' plotSim(sim_data, concentration = obs_data, plotly = TRUE)
 #' }
 #' @import ggplot2
 #' @importFrom scales pseudo_log_trans
@@ -112,14 +120,14 @@ runSim <- function(model, population_data, amt, plot = FALSE) {
 #'
 #'
 
-plotSim <- function(sim_data, unit = "mg/L", log_scale = FALSE) {
+plotSim <- function(sim_data, unit = "mg/L", log_scale = FALSE, plotly = FALSE, concentration = NULL) {
   # get 95% prediction interval
   sim_data <- sim_data |>
     dplyr::group_by(time) |>
     dplyr::summarise(
-      q2.5 = quantile(CENT, 0.025, na.rm = TRUE),
-      q97.5 = quantile(CENT, 0.975, na.rm = TRUE),
-      median = median(CENT, na.rm = TRUE)
+      q2.5 = stats::quantile(CENT, 0.025, na.rm = TRUE),
+      q97.5 = stats::quantile(CENT, 0.975, na.rm = TRUE),
+      median = stats::median(CENT, na.rm = TRUE)
     )
 
 
@@ -138,12 +146,35 @@ plotSim <- function(sim_data, unit = "mg/L", log_scale = FALSE) {
     ) +
     ggplot2::theme_bw()
 
+  # add observed concentration data if provided
+  if (!is.null(concentration)) {
+    # validate that concentration has required columns
+    if (!all(c("time", "concentration") %in% names(concentration))) {
+      stop("concentration dataframe must have 'time' and 'concentration' columns")
+    }
+    plot <- plot + ggplot2::geom_point(
+      data = concentration,
+      ggplot2::aes(x = time, y = concentration),
+      color = "red",
+      size = 3,
+      shape = 16
+    )
+  }
+
   # set log axis if specified
   if (log_scale == "pseudo") {
     plot <- plot + ggplot2::scale_y_continuous(trans = scales::pseudo_log_trans(base = 10))
   }
   if (log_scale == TRUE) {
     plot <- plot + ggplot2::scale_y_log10()
+  }
+
+  # convert to plotly if requested
+  if (plotly) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+      stop("Package 'plotly' is required for plotly output. Please install it.")
+    }
+    plot <- plotly::ggplotly(plot)
   }
 
   return(plot)
