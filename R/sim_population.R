@@ -73,6 +73,7 @@ makePopulationData <- function(model, n = 1000, seed = TRUE) {
 #' @param population_data data.frame with individual parameters (output of makePopulationData)
 #' @param amt numeric, amount to administer to each individual
 #' @param plot logical, if TRUE return a plot of the simulation
+#' @param ... additional arguments to pass to mrgsolve::ev (e.g., ii, addl, tinf, until)
 #' @return mrgsolve simulation object or plot if plot = TRUE
 #' @examples
 #' \dontrun{
@@ -85,10 +86,10 @@ makePopulationData <- function(model, n = 1000, seed = TRUE) {
 #' @importFrom graphics plot
 #' @author Romain Garreau
 #' @export
-runSim <- function(model, population_data, amt, plot = FALSE) {
+runSim <- function(model, population_data, amt, ...) {
   model_sim <- model |>
     mrgsolve::idata_set(population_data) |>
-    mrgsolve::ev(amt = amt) |>
+    mrgsolve::ev(amt = amt, ...) |>
     mrgsolve::mrgsim()
 
   return(model_sim)
